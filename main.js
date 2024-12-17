@@ -150,7 +150,7 @@ const getPostData = (requestData) => {
 const applyConfig = async (requestId, postData) => await axiosInstance.put(`/api/v1/request/${requestId}`, postData)
 const approveRequest = async (requestId) => await axiosInstance.post(`/api/v1/request/${requestId}/approve`)
 
-const sendToInstances = async (instances, requestId, data) => {
+const sendToInstances = async (instances, requestId, media_type, data) => {
     const instancesArray = Array.isArray(instances) ? instances : [instances]
     for (const item of instancesArray) {
         try {
@@ -163,6 +163,7 @@ const sendToInstances = async (instances, requestId, data) => {
             postData.rootFolder = instance.root_folder
             postData.serverId = instance.server_id
             if (instance.quality_profile_id) postData.profileId = instance.quality_profile_id
+            if (instance.series_type && media_type === "tv") postData.seriesType = instance.series_type
 
             logger.debug({
                 message: "Sending configuration to instance",
@@ -205,7 +206,7 @@ app.post("/webhook", async (req, res) => {
         )
         const instances = findMatchingInstances(req.body, data, config.filters)
         const postData = getPostData(req.body)
-        if (instances) await sendToInstances(instances, request.request_id, postData)
+        if (instances) await sendToInstances(instances, request.request_id, media.media_type, postData)
         return res.status(200).send()
     } catch (error) {
         const message = `Error handling webhook: ${error.message}`

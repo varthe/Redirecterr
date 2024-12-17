@@ -34,6 +34,10 @@ const schema = {
                         quality_profile_id: {
                             type: "number",
                         },
+                        series_type: {
+                            type: "string",
+                            enum: ["standard", "anime", "daily"],
+                        },
                         approve: {
                             type: "boolean",
                         },
