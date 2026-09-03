@@ -22,7 +22,7 @@ services:
 > [!IMPORTANT]  
 > Disable automatic request approval for your users
 
-In Overseerr go to **Settings -> Notifications -> Webhook** and configure the following:
+In Seerr go to **Settings -> Notifications -> Webhook** and configure the following:
 
 - **Enable Agent**: Enabled
 - **Webhook URL**: `http://redirecterr:8481/webhook`
@@ -50,12 +50,23 @@ In Overseerr go to **Settings -> Notifications -> Webhook** and configure the fo
 
 Create a `config.yaml` file with the following sections:
 
-### Overseerr settings
+### Seerr settings
 
 ```yaml
-overseerr_url: ""
-overseerr_api_token: ""
+seerr_url: ""
+seerr_api_token: ""
 approve_on_no_match: true # Auto-approve if no filters match
+```
+
+> [!NOTE]
+> The legacy `overseerr_url` / `overseerr_api_token` names are still accepted for backwards compatibility. Provide either the new `seerr_*` names or the old `overseerr_*` names (do not mix). `seerr_*` takes precedence when both are present.
+
+> [!NOTE]
+> `seerr_email` and `seerr_password` are optional. They're only required when CSRF protection is enabled on Seerr (Settings -> Security), where API-key-only requests are rejected with 403. If set, Redirecterr logs into a local session to satisfy CSRF.
+
+```yaml
+seerr_email: ""
+seerr_password: ""
 ```
 
 ### Instances
@@ -65,14 +76,14 @@ Define your Radarr/Sonarr instances
 ```yaml
 instances:
   radarr:
-    server_id: 0 # Match the order in Overseerr > Settings > Services (example below)
+    server_id: 0 # Match the order in Seerr > Settings > Services (example below)
     root_folder: /mnt/movies
     # quality_profile_id: 1  # Optional
     # approve: false         # Optional (default is true)
 ```
 
-- `server_id`: Starts at 0, increases left to right in Overseerr UI. [Visual example](https://github.com/user-attachments/assets/a7a60d91-0f24-42a9-bbe1-ea4f1c945e6a)
-- `quality_profile_id` (Optional): Override Overseerr default. Get IDs from:
+- `server_id`: Starts at 0, increases left to right in Seerr UI. [Visual example](https://github.com/user-attachments/assets/a7a60d91-0f24-42a9-bbe1-ea4f1c945e6a)
+- `quality_profile_id` (Optional): Override Seerr default. Get IDs from:
 
   ```
   http://<arr-url>/api/v3/qualityProfile?apiKey=<api-key>
@@ -115,8 +126,8 @@ filters:
 ### Sample config
 
 ```yaml
-overseerr_url: ""
-overseerr_api_token: ""
+seerr_url: ""
+seerr_api_token: ""
 
 approve_on_no_match: true
 

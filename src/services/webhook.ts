@@ -1,6 +1,6 @@
 import logger from "../utils/logger"
 import { config } from "../config"
-import { approveRequest, fetchFromOverseerr } from "../api/overseerr"
+import { approveRequest, fetchFromSeerr } from "../api/seerr"
 import { getPostData } from "../utils/helpers"
 import { findInstances } from "./filter"
 import { sendToInstances } from "./instance"
@@ -42,8 +42,8 @@ export const handleWebhook = async (webhook: Webhook): Promise<Response> => {
     }
 
     try {
-        // Fetch media data from Overseerr
-        const data = await fetchFromOverseerr(`/api/v1/${media.media_type}/${media.tmdbId}`)
+        // Fetch media data from Seerr
+        const data = await fetchFromSeerr(`/api/v1/${media.media_type}/${media.tmdbId}`)
         logger.info(
             `Received request ID ${request.request_id} for ${media.media_type} "${data?.originalTitle || data?.originalName}"`
         )

@@ -1,6 +1,6 @@
 import logger from "../utils/logger"
 import { config } from "../config"
-import { approveRequest, applyConfig } from "../api/overseerr"
+import { approveRequest, applyConfig } from "../api/seerr"
 import { buildDebugLogMessage } from "../utils/helpers"
 import type { PostData } from "../types"
 
