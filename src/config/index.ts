@@ -1,5 +1,5 @@
 import fs from "fs"
-import yaml from "js-yaml"
+import * as yaml from "js-yaml"
 import Ajv, { type ErrorObject, type Schema } from "ajv"
 import logger from "../utils/logger"
 import type { Config } from "../types"
@@ -8,7 +8,7 @@ const ajv = new Ajv({ allErrors: true })
 
 const yamlFilePath = process.argv[3] || "./config.yaml"
 
-const schema: Schema = {
+const validationSchema: Schema = {
     $schema: "http://json-schema.org/draft-07/schema#",
     type: "object",
     properties: {
@@ -122,6 +122,37 @@ const schema: Schema = {
     required: ["overseerr_url", "overseerr_api_token", "instances", "filters"],
 }
 
+const splitOnFirstWhitespace = (text: string): [string, string?] => {
+    const index = text.indexOf(' ')
+    return index === -1 ? [text] : [text.slice(0, index), text.slice(index + 1)]
+}
+
+const isNullOrWhitespace = (value: string | null | undefined): value is null | undefined | "" => {
+    return !value || value.trim() === ""
+}
+
+const envTag = yaml.defineScalarTag('!env_var', {
+    resolve: (scalar: string): string | typeof yaml.NOT_RESOLVED => {
+        if (isNullOrWhitespace(scalar)) return yaml.NOT_RESOLVED
+
+        const split = splitOnFirstWhitespace(scalar.trim())
+        const envVarName = split[0]
+        
+        let envVarValue = process.env[envVarName]
+        if (isNullOrWhitespace(envVarValue)) {
+            envVarValue = split.at(1)?.trim().replace(/^['"]|['"]$/g, '')
+        }
+        if (isNullOrWhitespace(envVarValue)) {
+            throw new Error(`undefined environment variable '${envVarName}' and no default is specified`)
+        }
+        
+        return envVarValue
+    },
+    identify: () => false
+})
+
+const yamlSchema = yaml.CORE_SCHEMA.withTags([envTag])
+
 /**
  * Format validation errors into a readable string
  */
@@ -136,7 +167,7 @@ const formatErrors = (errors: ErrorObject[] | null | undefined): string => {
         .join("\n")
 }
 
-const validate = ajv.compile<Config>(schema)
+const validate = ajv.compile<Config>(validationSchema)
 
 /**
  * Load and validate the configuration file
@@ -149,7 +180,7 @@ const loadConfig = async (): Promise<Config> => {
         }
 
         const fileContents = fs.readFileSync(yamlFilePath, "utf8")
-        const config = yaml.load(fileContents)
+        const config = yaml.load(fileContents, { schema: yamlSchema })
 
         if (!validate(config)) {
             throw new Error(`\n${formatErrors(validate.errors)}`)

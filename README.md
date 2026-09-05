@@ -112,6 +112,45 @@ filters:
 > [!TIP]  
 > For a list of possible condition fields see [fields.md](https://github.com/varthe/Redirecterr/blob/main/fields.md)
 
+### Enviroment Variables
+
+Dynamically inject environment variables into your configuration file to avoid hardcoding sensitive data.
+
+#### Syntax
+
+```yaml
+!env_var VARIABLE_NAME optional_default
+```
+
+Where:
+- VARIABLE_NAME is the environment variable name (case-sensitive)
+- optional_default is used when the variable is undefined, empty, or whitespace-only
+
+#### Usage
+
+```yaml
+overseerr_url: !env_var SEERR_URL
+overseerr_api_token: !env_var SEERR_API_KEY
+```
+
+> [!WARNING]  
+> Without a default value, the configuration will fail to load if the environment variable is missing or empty.
+
+#### Default Values
+
+Defaults can include spaces:
+
+```yaml
+!env_var MY_VAR my default value
+```
+
+Quotes around defaults are stripped (but not required for spaces):
+
+```yaml
+!env_var MY_VAR "my default value"
+# Results in: my default value
+```
+
 ### Sample config
 
 ```yaml
