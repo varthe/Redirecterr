@@ -67,7 +67,8 @@ Thumbs.db
 *.swo
 
 # Tests
-filters.test.js
+*.test.ts
+*.test.js
 test/
 
 
