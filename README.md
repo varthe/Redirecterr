@@ -69,6 +69,7 @@ instances:
     root_folder: /mnt/movies
     # quality_profile_id: 1  # Optional
     # approve: false         # Optional (default is true)
+    # is_4k: false           # Optional (default is false)
 ```
 
 - `server_id`: Starts at 0, increases left to right in Overseerr UI. [Visual example](https://github.com/user-attachments/assets/a7a60d91-0f24-42a9-bbe1-ea4f1c945e6a)
@@ -79,6 +80,7 @@ instances:
   ```
 
 - `approve`: Set to false to disable auto-approval.
+- `is_4k`: Set to true for 4K instances. Required for dual-routing in `apply`.
 
 ### Filters
 
@@ -127,6 +129,7 @@ instances:
   sonarr_4k:
     server_id: 1
     root_folder: "/mnt/plex/Shows - 4K"
+    is_4k: true
   sonarr_anime:
     server_id: 2
     root_folder: "/mnt/plex/Anime"

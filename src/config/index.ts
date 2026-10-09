@@ -42,6 +42,9 @@ const schema: Schema = {
                         approve: {
                             type: "boolean",
                         },
+                        is_4k: {
+                            type: "boolean",
+                        },
                     },
                     required: ["server_id", "root_folder"],
                 },
@@ -153,6 +156,36 @@ const loadConfig = async (): Promise<Config> => {
 
         if (!validate(config)) {
             throw new Error(`\n${formatErrors(validate.errors)}`)
+        }
+
+        for (const [index, filter] of config.filters.entries()) {
+            const applyList = Array.isArray(filter.apply) ? filter.apply : [filter.apply]
+
+            for (const item of applyList) {
+                if (!config.instances[item]) {
+                    throw new Error(`Filter at index ${index} references unknown instance "${item}"`)
+                }
+            }
+
+            if (applyList.length > 1) {
+                let standardCount = 0
+                let fourKCount = 0
+
+                for (const item of applyList) {
+                    if (config.instances[item]?.is_4k) {
+                        fourKCount++
+                    } else {
+                        standardCount++
+                    }
+                }
+
+                if (standardCount > 1 || fourKCount > 1) {
+                    throw new Error(
+                        `Filter at index ${index} has invalid 'apply': [${applyList.join(", ")}]. ` +
+                        `A single request can at most be routed to one standard and one 4K instance.`
+                    )
+                }
+            }
         }
 
         if (logger.isDebugEnabled()) {

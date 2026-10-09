@@ -22,6 +22,7 @@ interface InstanceConfig {
     root_folder: string
     quality_profile_id?: number
     approve?: boolean
+    is_4k?: boolean
 }
 
 export interface Config {

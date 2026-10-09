@@ -69,7 +69,7 @@ export const handleWebhook = async (webhook: Webhook): Promise<Response> => {
         
         // Process request based on filter matches
         if (instances) {
-            await sendToInstances(instances, request.request_id, postData)
+            await sendToInstances(instances, webhook, postData)
             return createResponse("success", `Request processed and sent to instances`, 200)
         } else if (config.approve_on_no_match) {
             logger.info(`Approving unmatched request ID ${request.request_id}`)
